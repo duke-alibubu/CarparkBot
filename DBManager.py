@@ -4,18 +4,20 @@ class DBManager():
 
     def __init__(self, SQL_SERVER):
 
+        # DATABASE (db.sqlite3)
         self.SQL_SERVER = SQL_SERVER
-
+        # 'users' table
         self.SQL_USERS = 'users'
         self.USER_ID = 'user_id'
         self.RECENT_SEARCHES = 'recent_searches'
-
+        # 'carparks' table
         self.SQL_CARPARKS = 'carparks'
         self.CARPARK_ID = 'carpark_id'
         self.ADDRESS = 'address'
         self.X_COORD = 'x_coord'
         self.Y_COORD = 'y_coord'
 
+        # Try creating tables if not existed
         try:
             conn = sqlite3.connect(self.SQL_SERVER)
             c = conn.cursor()
@@ -50,7 +52,7 @@ class DBManager():
         except Exception as e:
             print('Error DB:'+ str(e))
             return None
-        # Get sampling interval update from the database
+        # Get recent search input for a specific user from the database
         try:
             c.execute('SELECT {c2} FROM {tn} WHERE {c1}={user_id}'\
                 .format(tn=self.SQL_USERS, c1=self.USER_ID, c2=self.RECENT_SEARCHES, user_id=user_id))
@@ -84,7 +86,7 @@ class DBManager():
         except Exception as e:
             print("Error in opening: "+str(e))
             return False
-        # Add the sampling interval update to the database
+        # Add the search input of a specific user to the database
         try:
             c.execute('SELECT EXISTS (SELECT {c1} from {tn} WHERE {c1} = {user_id})'\
                 .format(tn=self.SQL_USERS, c1=self.USER_ID, user_id=user_id))
@@ -131,7 +133,7 @@ class DBManager():
         except Exception as e:
             print("Error in opening: "+str(e))
             return False
-        # Check if user exists
+        # Check if the specific user exists
         try:
             c.execute('SELECT EXISTS (SELECT {c1} from {tn} WHERE {c1} = {user_id})'\
                 .format(tn=self.SQL_USERS, c1=self.USER_ID, user_id=user_id))
@@ -145,9 +147,11 @@ class DBManager():
 
     def search_carpark(self,address):
 
+        # First try of connecting sqlite database
         try:
             conn = sqlite3.connect(self.SQL_SERVER)
             c = conn.cursor()
+            # Search for carparks that are matched with the user's input
             c.execute('SELECT * FROM {tn}'.format(tn=self.SQL_CARPARKS))
             allrows = c.fetchall()
             car_parks = []
@@ -160,5 +164,4 @@ class DBManager():
         except Exception as e:
             print("Error in opening: "+str(e))
             return False
-        
         return False
