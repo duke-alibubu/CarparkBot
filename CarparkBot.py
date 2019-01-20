@@ -9,11 +9,15 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 from DBManager import DBManager
+from pyproj import Proj, transform
 
-id_info = {}
+
 chrome = webdriver.Chrome("chromedriver.exe")
-bot = telepot.Bot("716614375:AAH9blmR2YkD0IDqqGj66KHV8KnxXJHg9QM")
+bot = telepot.Bot("592470508:AAENRFAi4mqw3OcVtYphyLDfSpuX51flsDg")
 url = "https://api.data.gov.sg/v1/transport/carpark-availability"
+db = DBManager('db.sqlite3')
+inProj = Proj(init='epsg:3414')
+outProj = Proj(init='epsg:4326')
 
     
 def handle(msg):#a function to tell the bot what to do when users answer with text
@@ -24,6 +28,7 @@ def handle(msg):#a function to tell the bot what to do when users answer with te
     try:
         if msg['text'] == '/start':
             bot.sendMessage(chat_id, "Hi %s, where do you want to park your car?" % msg['chat']['first_name'])
+            return
         print(content_type, chat_type, chat_id)
     except:
         bot.sendMessage(chat_id, 'Please input text!')
@@ -38,11 +43,13 @@ def handle(msg):#a function to tell the bot what to do when users answer with te
             else:
                 response = requests.get(url)
                 carpark_list_api = response.json()['items'][0]['carpark_data']
-                bot.sendMessage(chat_id,"Okay here is what I found")
+                bot.sendMessage(chat_id,"Okay here is what I found:")
                 for matched_carpark in matched_carparks:
                     for carpark in carpark_list_api:
                         if (matched_carpark[0] == carpark['carpark_number']):
                             bot.sendMessage(chat_id, 'Carpark number: %s \nAddress: %s \nLots available: %s' %(matched_carpark[0], matched_carpark[1], carpark['carpark_info'][0]['lots_available']))
+                            lon, lat = transform(inProj, outProj, float(matched_carpark[2]), float(matched_carpark[3]))
+                            bot.sendLocation(chat_id, lat, lon)
                 db.add(chat_id, msg['text'].upper())
                 recent_search = db.recent_search(chat_id).split(',')
                 if len(recent_search) == 1 :
@@ -66,7 +73,7 @@ def handle(msg):#a function to tell the bot what to do when users answer with te
                         [InlineKeyboardButton(text=rec_search2, callback_data=rec_search2)],
                         [InlineKeyboardButton(text=rec_search3, callback_data=rec_search3)]])
 
-                bot.sendMessage(chat_id, "Also here is your recent searches. You may choose one of the following:",reply_markup=keyboard1)
+                bot.sendMessage(chat_id, "Also here are your recent searches. You may choose one of the following:",reply_markup=keyboard1)
                 bot.sendMessage(chat_id, "Or where else do you want to park?")
             
             
@@ -77,11 +84,13 @@ def handle(msg):#a function to tell the bot what to do when users answer with te
             else:
                 response = requests.get(url)
                 carpark_list_api = response.json()['items'][0]['carpark_data']
-                bot.sendMessage(chat_id,"Okay here is what I found")
+                bot.sendMessage(chat_id,"Okay here is what I found:")
                 for matched_carpark in matched_carparks:
                     for carpark in carpark_list_api:
                         if (matched_carpark[0] == carpark['carpark_number']):
                             bot.sendMessage(chat_id, 'Carpark number: %s \nAddress: %s \nLots available: %s' %(matched_carpark[0], matched_carpark[1], carpark['carpark_info'][0]['lots_available']))
+                            lon, lat = transform(inProj, outProj, float(matched_carpark[2]), float(matched_carpark[3]))
+                            bot.sendLocation(chat_id, lat, lon)
                 recent_search = db.recent_search(chat_id).split(',')
                 if msg['text'].upper() not in recent_search:
                     db.add(chat_id, msg['text'].upper())
@@ -109,7 +118,7 @@ def handle(msg):#a function to tell the bot what to do when users answer with te
                     [InlineKeyboardButton(text=rec_search3, callback_data=rec_search3)]])
                
             
-            bot.sendMessage(chat_id, "Also here is your recent searches. You may choose one of the following:" ,reply_markup=keyboard1)
+            bot.sendMessage(chat_id, "Also here are your recent searches. You may choose one of the following:" ,reply_markup=keyboard1)
             bot.sendMessage(chat_id, "Or where else do you want to park?")
     else:
         bot.sendMessage(chat_id, 'Please input text!')        
@@ -128,7 +137,8 @@ def bot_continue(msg) : #a function to tell the bot what to do when users answer
             for carpark in carpark_list_api:
                 if (matched_carpark[0] == carpark['carpark_number']):
                     bot.sendMessage(chat_id, 'Carpark number: %s \nAddress: %s \nLots available: %s' %(matched_carpark[0], matched_carpark[1], carpark['carpark_info'][0]['lots_available']))
-    
+                    lon, lat = transform(inProj, outProj, float(matched_carpark[2]), float(matched_carpark[3]))
+                    bot.sendLocation(chat_id, lat, lon)
 
     recent_search = db.recent_search(chat_id).split(',')
     
@@ -155,9 +165,6 @@ def bot_continue(msg) : #a function to tell the bot what to do when users answer
 
     bot.sendMessage(chat_id, "Also here is your recent searches. You may choose one of the following:" ,reply_markup=keyboard1)
     bot.sendMessage(chat_id, "Or where else do you want to park?")
-
-
-db = DBManager('db.sqlite3')
 
 #tell the bot how to handle messages
 MessageLoop(bot, {'chat': handle,

@@ -13,14 +13,17 @@ class DBManager():
         self.SQL_CARPARKS = 'carparks'
         self.CARPARK_ID = 'carpark_id'
         self.ADDRESS = 'address'
+        self.X_COORD = 'x_coord'
+        self.Y_COORD = 'y_coord'
 
         try:
             conn = sqlite3.connect(self.SQL_SERVER)
             c = conn.cursor()
             c.execute('CREATE TABLE IF NOT EXISTS {tn} ({c1} {t1} PRIMARY KEY, {c2} {t2})'.\
                 format(tn=self.SQL_USERS, c1=self.USER_ID, t1='INTEGER', c2=self.RECENT_SEARCHES, t2='VARCHAR'))
-            c.execute('CREATE TABLE IF NOT EXISTS {tn} ({c1} {t1} PRIMARY KEY, {c2} {t2})'.\
-                format(tn=self.SQL_CARPARKS, c1=self.CARPARK_ID, t1='VARCHAR', c2=self.ADDRESS, t2='VARCHAR'))
+            c.execute('CREATE TABLE IF NOT EXISTS {tn} ({c1} {t1} PRIMARY KEY, {c2} {t2}, {c3} {t3}, {c4} {t4})'.\
+                format(tn=self.SQL_CARPARKS, c1=self.CARPARK_ID, t1='VARCHAR', c2=self.ADDRESS, t2='VARCHAR',
+                c3=self.X_COORD, t3='FLOAT', c4=self.Y_COORD, t4='FLOAT'))
             conn.commit()
             conn.close()
         except FileNotFoundError:
@@ -30,8 +33,9 @@ class DBManager():
             c = conn.cursor()
             c.execute('CREATE TABLE IF NOT EXISTS {tn} ({c1} {t1} PRIMARY KEY, {c2} {t2})'.\
                 format(tn=self.SQL_USERS, c1=self.USER_ID, t1='INTEGER', c2=self.RECENT_SEARCHES, t2='VARCHAR'))
-            c.execute('CREATE TABLE IF NOT EXISTS {tn} ({c1} {t1} PRIMARY KEY, {c2} {t2})'.\
-                format(tn=self.SQL_CARPARKS, c1=self.CARPARK_ID, t1='VARCHAR', c2=self.ADDRESS, t2='VARCHAR'))
+            c.execute('CREATE TABLE IF NOT EXISTS {tn} ({c1} {t1} PRIMARY KEY, {c2} {t2}, {c3} {t3}, {c4} {t4})'.\
+                format(tn=self.SQL_CARPARKS, c1=self.CARPARK_ID, t1='VARCHAR', c2=self.ADDRESS, t2='VARCHAR',
+                c3=self.X_COORD, t3='FLOAT', c4=self.Y_COORD, t4='FLOAT'))
             conn.commit()
             conn.close()
         except Exception as e:
@@ -140,7 +144,7 @@ class DBManager():
             return False
 
     def search_carpark(self,address):
-        
+
         try:
             conn = sqlite3.connect(self.SQL_SERVER)
             c = conn.cursor()
