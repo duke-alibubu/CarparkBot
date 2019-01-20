@@ -1,4 +1,5 @@
-  OUR TEAM (3eagles): Tran Huu Hoang, Nguyen Doan Hoang Lam, Le Tan Khang, Trinh Tuan Dung
+  OUR TEAM (3eagles): Tran Huu Hoang(672), Nguyen Doan Hoang Lam(655), Le Tan Khang(645), Trinh Tuan Dung(665)
+  TEAM ID: DJ
   
   WHAT WE MADE: A Python-coded Telegram Chatbot which 
 - Allows user to search for availability carpark lots in a specific area, and return the locations on Google Map
@@ -7,7 +8,7 @@
 - Contains 2 database systems storing information of users'id, their recent searches and all the available parking lots 
 
   TO CHAT WITH OUR BOT:
-- Simply search for: "CarPark HDB" on Telegram and find the one with 3 eagles!
+- Simply search for: "CarPark HDB" on Telegram and find the one with 3 eagles as avatar!
 - Then press "Start"
 - Enter a specific LOCATION
 - Press the image to see the location on Google Map
