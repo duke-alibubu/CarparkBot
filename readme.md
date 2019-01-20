@@ -18,3 +18,5 @@
   NOTICE:
 - We have successfully deploy our bot by heroku!
 - How ever, in case you cannot chat with our bot (probably heroku server down), please run CarparkBot.py, then you can talk to the bot!
+  
+  OUR BOT: https://web.telegram.org/#/im?p=@Carpark_HDB_BOT
